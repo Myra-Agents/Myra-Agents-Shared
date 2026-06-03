@@ -3,7 +3,7 @@
 Shared TypeScript types, contracts, and domain helpers for the Myra Agents
 ecosystem. Consumed as a git submodule (`packages/shared`) by:
 
-- **[Myra-Agents](https://github.com/Gamma-Software/Myra-Agents)** — the desktop + web app (public)
+- **[Myra-Agents](https://github.com/Myra-Agents/Myra-Agents)** — the desktop + web app (public)
 - **Myra-Agents-Server** — the agent runner / sidecar (private)
 - **Myra-Agents-Hub** — the centralized cloud hub (private)
 
