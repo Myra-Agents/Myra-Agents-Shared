@@ -18,6 +18,28 @@ export interface AppSettings {
   defaultHomePage: "kanban" | "schedules" | "planner" | "logs";
   locale: "auto" | "en" | "fr";
   theme: "light" | "dark" | "system";
+  /**
+   * Folder names of installed plugins the user has switched off. A disabled
+   * plugin contributes no agent presets (and, once the server dispatches bus
+   * events to plugins, receives none). Omitted/empty = all enabled.
+   */
+  disabledPlugins?: string[];
+}
+
+/**
+ * An installed plugin as surfaced by the `list_plugins` rpc. `name` is the
+ * install identity — the plugin's folder name under `~/.myra-agents/plugins/`,
+ * which is what {@link AppSettings.disabledPlugins} keys on.
+ */
+export interface PluginInfo {
+  name: string;
+  manifestName?: string;
+  version?: string;
+  /** `"agent"` (contributes presets) and/or `"event"` (exec + subscribes). */
+  roles: ("agent" | "event")[];
+  subscribes: string[];
+  providesAgents: AgentPreset[];
+  enabled: boolean;
 }
 
 export const DEFAULT_AGENT_PRESETS: AgentPreset[] = [
@@ -48,4 +70,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   defaultHomePage: "kanban",
   locale: "auto",
   theme: "system",
+  disabledPlugins: [],
 };
