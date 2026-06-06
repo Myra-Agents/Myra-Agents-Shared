@@ -24,6 +24,54 @@ export interface AppSettings {
    * events to plugins, receives none). Omitted/empty = all enabled.
    */
   disabledPlugins?: string[];
+  /**
+   * Non-secret plugin config values, keyed `pluginFolder → { CONFIG_KEY → value }`.
+   * Secret-typed fields are NOT here — they live in the OS keychain. Omitted = none.
+   */
+  pluginConfig?: Record<string, Record<string, string | number | boolean>>;
+}
+
+/** A user-supplied plugin setting, rendered as a form field in Settings → Plugins. */
+export interface PluginConfigField {
+  /** `^[A-Z][A-Z0-9_]*$`. Referenced by webhooks and injected as an env var into exec. */
+  key: string;
+  label: string;
+  type: "string" | "secret" | "boolean" | "number" | "select" | "multiselect";
+  /** Choices for select/multiselect. */
+  options?: string[];
+  required?: boolean;
+  default?: string | number | boolean;
+  description?: string;
+  placeholder?: string;
+}
+
+/** Named signature scheme verified by the core for an inbound webhook. */
+export interface WebhookVerify {
+  scheme: "hmac-sha256" | "slack" | "stripe";
+  /** Header carrying the signature (e.g. X-Hub-Signature-256). */
+  header?: string;
+  /** Config key whose value is the shared signing secret. */
+  secretFrom?: string;
+}
+
+/**
+ * A webhook the server core runs for a plugin. `out` POSTs on bus events;
+ * `in` exposes a signed HTTP route at `/hooks/<plugin>/<route>`.
+ */
+export interface WebhookSpec {
+  id: string;
+  direction: "out" | "in";
+  // outbound
+  urlFrom?: string;
+  events?: string[];
+  template?: string;
+  // inbound
+  route?: string;
+  verify?: WebhookVerify;
+  action?: string;
+  map?: Record<string, string>;
+  /** Optional escape hatch: core invokes it request/response for verify/transform. */
+  exec?: string;
 }
 
 /**
@@ -35,10 +83,14 @@ export interface PluginInfo {
   name: string;
   manifestName?: string;
   version?: string;
-  /** `"agent"` (contributes presets) and/or `"event"` (exec + subscribes). */
-  roles: ("agent" | "event")[];
+  /** `"agent"`, `"event"`, and/or `"webhook"` (declares webhooks). */
+  roles: ("agent" | "event" | "webhook")[];
   subscribes: string[];
   providesAgents: AgentPreset[];
+  /** Settings the user fills in, rendered as a form. */
+  config: PluginConfigField[];
+  /** Webhooks the core runs for this plugin. */
+  webhooks: WebhookSpec[];
   enabled: boolean;
 }
 
@@ -71,4 +123,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   locale: "auto",
   theme: "system",
   disabledPlugins: [],
+  pluginConfig: {},
 };
