@@ -27,7 +27,19 @@ export interface AgentFlagDef {
   takesValue?: boolean;
   /** Placeholder for the value input. */
   valuePlaceholder?: string;
-  /** Surfaced as a dedicated checkbox (others live in the multiselect). */
+  /**
+   * Render the value as a dropdown limited to these choices instead of a free
+   * input. For provider-dependent choices, resolve at render time (see
+   * {@link opencodeVariantsForModel}).
+   */
+  options?: string[];
+  /**
+   * Populate the dropdown choices from a server rpc (e.g. `"list_models"` runs
+   * `opencode models` on the connected machine). Falls back to a free input
+   * when the rpc is unavailable or fails.
+   */
+  optionsRpc?: "list_models";
+  /** Surfaced as a dedicated checkbox or dropdown (others live in the multiselect). */
   featured?: boolean;
   /** Visually flagged as dangerous (e.g. permission bypass). */
   danger?: boolean;
@@ -45,12 +57,25 @@ export const AGENT_FLAG_CATALOG: Record<string, AgentFlagDef[]> = {
       featured: true,
       danger: true,
     },
-    { flag: "--share", hint: "Share the session", featured: true },
-    { flag: "--thinking", hint: "Show thinking blocks", featured: true },
+    { flag: "--share", hint: "Share the session" },
+    { flag: "--thinking", hint: "Show thinking blocks" },
     { flag: "--continue", hint: "Continue the last session" },
     { flag: "--fork", hint: "Fork the session when continuing" },
-    { flag: "--model", hint: "Model to use", takesValue: true, valuePlaceholder: "provider/model" },
-    { flag: "--variant", hint: "Model variant (reasoning effort)", takesValue: true, valuePlaceholder: "high" },
+    {
+      flag: "--model",
+      hint: "Model to use",
+      takesValue: true,
+      valuePlaceholder: "provider/model",
+      optionsRpc: "list_models",
+      featured: true,
+    },
+    {
+      flag: "--variant",
+      hint: "Model variant (reasoning effort)",
+      takesValue: true,
+      valuePlaceholder: "high",
+      featured: true,
+    },
     { flag: "--agent", hint: "Agent to use", takesValue: true, valuePlaceholder: "build" },
     { flag: "--session", hint: "Session id to continue", takesValue: true, valuePlaceholder: "ses_…" },
     { flag: "--title", hint: "Title for the session", takesValue: true },
@@ -63,6 +88,34 @@ export const AGENT_FLAG_CATALOG: Record<string, AgentFlagDef[]> = {
     { flag: "--pure", hint: "Run without external plugins" },
   ],
 };
+
+/**
+ * OpenCode reasoning-effort variants per provider. The CLI has no command to
+ * enumerate them, so this mirrors the documented defaults — variants are fixed
+ * per provider, not per model (opencode.ai/docs/models).
+ */
+export const OPENCODE_VARIANTS_BY_PROVIDER: Record<string, string[]> = {
+  anthropic: ["high", "max"],
+  openai: ["none", "minimal", "low", "medium", "high", "xhigh"],
+  google: ["low", "high"],
+};
+
+/**
+ * Effort choices for an opencode `provider/model` id. Unknown or empty model →
+ * the union of all known variants (the provider can't be inferred yet).
+ */
+export function opencodeVariantsForModel(model: string): string[] {
+  const provider = model.split("/")[0]?.trim().toLowerCase() ?? "";
+  const known = OPENCODE_VARIANTS_BY_PROVIDER[provider];
+  if (known) return known;
+  const all = Object.values(OPENCODE_VARIANTS_BY_PROVIDER).flat();
+  return [...new Set(all)];
+}
+
+/** Result of the `list_models` rpc — model ids the agent CLI reports. */
+export interface AgentModelsResult {
+  models: string[];
+}
 
 /** One way of installing an agent binary, shown in the manual-install dialog. */
 export interface AgentInstallMethod {
