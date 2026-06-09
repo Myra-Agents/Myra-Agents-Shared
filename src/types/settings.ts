@@ -45,12 +45,21 @@ export const AGENT_FLAG_CATALOG: Record<string, AgentFlagDef[]> = {
       featured: true,
       danger: true,
     },
-    { flag: "--share", hint: "Share the session", featured: true },
-    { flag: "--thinking", hint: "Show thinking blocks", featured: true },
+    { flag: "--share", hint: "Share the session" },
+    { flag: "--thinking", hint: "Show thinking blocks" },
     { flag: "--continue", hint: "Continue the last session" },
     { flag: "--fork", hint: "Fork the session when continuing" },
-    { flag: "--model", hint: "Model to use", takesValue: true, valuePlaceholder: "provider/model" },
-    { flag: "--variant", hint: "Model variant (reasoning effort)", takesValue: true, valuePlaceholder: "high" },
+    // --model / --variant are featured but render as dropdowns (not checkboxes):
+    // the model list comes from the server's `list_models` rpc and the variant
+    // choices from the models.dev catalog for the selected model.
+    { flag: "--model", hint: "Model to use", takesValue: true, valuePlaceholder: "provider/model", featured: true },
+    {
+      flag: "--variant",
+      hint: "Model variant (reasoning effort)",
+      takesValue: true,
+      valuePlaceholder: "high",
+      featured: true,
+    },
     { flag: "--agent", hint: "Agent to use", takesValue: true, valuePlaceholder: "build" },
     { flag: "--session", hint: "Session id to continue", takesValue: true, valuePlaceholder: "ses_…" },
     { flag: "--title", hint: "Title for the session", takesValue: true },
