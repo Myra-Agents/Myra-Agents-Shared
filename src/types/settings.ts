@@ -134,18 +134,19 @@ export const DEFAULT_AGENT_PRESETS: AgentPreset[] = [
     binary: "opencode",
     argsTemplate: "run {prompt} --dangerously-skip-permissions",
   },
-  {
-    id: "copilot",
-    name: "GitHub Copilot CLI",
-    binary: "copilot",
-    argsTemplate: "-p {prompt} --yolo",
-  },
-  {
-    id: "claude",
-    name: "Claude CLI",
-    binary: "claude",
-    argsTemplate: "--dangerously-skip-permissions -p {prompt}",
-  },
+  // Only OpenCode ships for now — re-enable once integrated.
+  // {
+  //   id: "copilot",
+  //   name: "GitHub Copilot CLI",
+  //   binary: "copilot",
+  //   argsTemplate: "-p {prompt} --yolo",
+  // },
+  // {
+  //   id: "claude",
+  //   name: "Claude CLI",
+  //   binary: "claude",
+  //   argsTemplate: "--dangerously-skip-permissions -p {prompt}",
+  // },
 ];
 
 export const DEFAULT_SETTINGS: AppSettings = {
