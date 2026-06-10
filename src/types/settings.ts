@@ -100,16 +100,21 @@ export const OPENCODE_VARIANTS_BY_PROVIDER: Record<string, string[]> = {
   google: ["low", "high"],
 };
 
+/** All variants ordered by increasing reasoning effort, for dropdown display. */
+const OPENCODE_VARIANT_ORDER = ["none", "minimal", "low", "medium", "high", "xhigh", "max"];
+
 /**
- * Effort choices for an opencode `provider/model` id. Unknown or empty model →
- * the union of all known variants (the provider can't be inferred yet).
+ * Effort choices for an opencode `provider/model` id, ordered by increasing
+ * effort. Unknown or empty model → the union of all known variants (the
+ * provider can't be inferred yet).
  */
 export function opencodeVariantsForModel(model: string): string[] {
   const provider = model.split("/")[0]?.trim().toLowerCase() ?? "";
   const known = OPENCODE_VARIANTS_BY_PROVIDER[provider];
-  if (known) return known;
-  const all = Object.values(OPENCODE_VARIANTS_BY_PROVIDER).flat();
-  return [...new Set(all)];
+  const variants = known ?? [...new Set(Object.values(OPENCODE_VARIANTS_BY_PROVIDER).flat())];
+  return [...variants].sort(
+    (a, b) => OPENCODE_VARIANT_ORDER.indexOf(a) - OPENCODE_VARIANT_ORDER.indexOf(b),
+  );
 }
 
 /** Result of the `list_models` rpc — model ids the agent CLI reports. */
