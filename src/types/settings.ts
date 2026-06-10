@@ -136,6 +136,19 @@ export interface AgentModelsResult {
    * to {@link opencodeVariantsForModel}.
    */
   variants?: Record<string, string[]>;
+  /**
+   * $ per million tokens per model id (models.dev data via
+   * `opencode models --verbose`). Absent for models without pricing data;
+   * `input === 0 && output === 0` means the model is free. Omitted by older
+   * servers.
+   */
+  cost?: Record<string, AgentModelCost>;
+}
+
+/** $/M-token pricing for one model. */
+export interface AgentModelCost {
+  input: number;
+  output: number;
 }
 
 /** One way of installing an agent binary, shown in the manual-install dialog. */
