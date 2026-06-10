@@ -126,6 +126,23 @@ export function opencodeVariantsForModel(model: string): string[] {
   return sortOpencodeVariants(known ?? [...new Set(Object.values(OPENCODE_VARIANTS_BY_PROVIDER).flat())]);
 }
 
+/** Result of the `list_flags` rpc — run flags parsed live from the CLI's help. */
+export interface AgentFlagsResult {
+  flags: AgentFlagDef[];
+}
+
+/**
+ * Merge the live flag list from `list_flags` with the static catalog. The
+ * static entries win for flags both know about (they carry curated hints,
+ * `featured`, `danger`, `optionsRpc`, placeholders); live-only flags are
+ * appended as-is so new CLI versions surface immediately. Static-only flags
+ * are kept too — dropping them would orphan saved presets if a parse hiccups.
+ */
+export function mergeFlagCatalog(catalog: AgentFlagDef[], live: AgentFlagDef[]): AgentFlagDef[] {
+  const known = new Set(catalog.map((def) => def.flag));
+  return [...catalog, ...live.filter((def) => !known.has(def.flag))];
+}
+
 /** Result of the `list_models` rpc — model ids the agent CLI reports. */
 export interface AgentModelsResult {
   models: string[];
