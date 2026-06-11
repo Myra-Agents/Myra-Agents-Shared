@@ -21,6 +21,17 @@ export interface ScheduledTask {
   schedule: ScheduleKind;
   enabled: boolean;
 
+  // Agent run config inherited by every card this schedule materializes. When
+  // unset, the materialized card falls back to the board's default agent.
+  /** Agent preset to launch the materialized card with. */
+  agentPresetId?: string;
+  /** Per-run CLI flag overrides (same encoding as {@link AgentPreset.flags}). */
+  agentFlags?: string[];
+  /** Run the agent inside a fresh git worktree of the working dir. */
+  useWorktree?: boolean;
+  /** Working directory the agent runs in (overrides the preset's). */
+  workingDir?: string;
+
   createdAt: string;
   lastTriggeredAt?: string;
   nextRunAt?: string;
@@ -34,6 +45,10 @@ export interface CreateScheduleInput {
   tags: string[];
   schedule: ScheduleKind;
   enabled: boolean;
+  agentPresetId?: string;
+  agentFlags?: string[];
+  useWorktree?: boolean;
+  workingDir?: string;
 }
 
 export interface UpdateScheduleInput extends CreateScheduleInput {

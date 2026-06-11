@@ -148,6 +148,12 @@ export function materializeCardForSchedule(task: ScheduledTask, now: string, pos
     createdAt: now,
     updatedAt: now,
     agentPrompt: task.agentPrompt,
+    // Inherit the schedule's agent run config so the launched card runs with the
+    // chosen preset/flags/worktree/dir instead of the board default.
+    agentPresetId: task.agentPresetId,
+    agentFlags: task.agentFlags,
+    useWorktree: task.useWorktree,
+    workingDir: task.workingDir,
     linkedTaskId: task.id,
     tags,
     position,
