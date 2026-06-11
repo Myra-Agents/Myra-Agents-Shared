@@ -31,6 +31,10 @@ export interface ScheduledTask {
   useWorktree?: boolean;
   /** Working directory the agent runs in (overrides the preset's). */
   workingDir?: string;
+  /** Launch-mode override for the run (overrides the preset's `launchVia`). */
+  launchVia?: "direct" | "ollama";
+  /** Local Ollama model for the run (used when `launchVia === "ollama"`). */
+  ollamaModel?: string;
 
   createdAt: string;
   lastTriggeredAt?: string;
@@ -49,6 +53,8 @@ export interface CreateScheduleInput {
   agentFlags?: string[];
   useWorktree?: boolean;
   workingDir?: string;
+  launchVia?: "direct" | "ollama";
+  ollamaModel?: string;
 }
 
 export interface UpdateScheduleInput extends CreateScheduleInput {

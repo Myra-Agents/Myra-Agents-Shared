@@ -154,6 +154,8 @@ export function materializeCardForSchedule(task: ScheduledTask, now: string, pos
     agentFlags: task.agentFlags,
     useWorktree: task.useWorktree,
     workingDir: task.workingDir,
+    launchVia: task.launchVia,
+    ollamaModel: task.ollamaModel,
     linkedTaskId: task.id,
     tags,
     position,
