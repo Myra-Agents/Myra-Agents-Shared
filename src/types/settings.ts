@@ -376,6 +376,26 @@ export interface AppSettings {
   agents: AgentPreset[];
   /** Maximum agents allowed to run concurrently. 0 = unlimited. */
   maxConcurrentAgents: number;
+  /**
+   * Hold an OS power assertion while at least one agent is running so the
+   * machine doesn't idle-sleep mid-run (which can sever a local-model session).
+   * macOS `caffeinate`, Linux `systemd-inhibit`, Windows `SetThreadExecutionState`.
+   * Acquired on the 0→1 running transition, released on 1→0. Best-effort —
+   * a failed assertion never blocks a run. Omitted = treated as `true`.
+   */
+  keepAwakeWhileRunning?: boolean;
+  /**
+   * When an agent run terminates abnormally (non-zero/killed exit, no result
+   * written) and the user did not cancel it — e.g. the machine slept and cut
+   * the session — relaunch it with the harness's continue flag to resume the
+   * conversation, up to {@link autoResumeMaxRetries} times. Omitted = `true`.
+   */
+  autoResumeInterrupted?: boolean;
+  /**
+   * Max automatic resume attempts per run before giving up (guards against an
+   * agent that crashes for a real reason looping forever). Omitted = `2`.
+   */
+  autoResumeMaxRetries?: number;
   defaultHomePage: "kanban" | "schedules" | "planner" | "logs";
   locale: "auto" | "en" | "fr";
   theme: "light" | "dark" | "system";
@@ -522,6 +542,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   defaultAgentId: "opencode",
   agents: DEFAULT_AGENT_PRESETS,
   maxConcurrentAgents: 2,
+  keepAwakeWhileRunning: true,
+  autoResumeInterrupted: true,
+  autoResumeMaxRetries: 2,
   defaultHomePage: "kanban",
   locale: "auto",
   theme: "system",
